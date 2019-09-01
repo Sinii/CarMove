@@ -123,7 +123,7 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
                                 .poll()
                                 ?.let {
                                     matrix.setTranslate(it.first, it.second)
-                                    matrix.setRotate(it.third)
+                                   // matrix.setRotate(it.third)
                                     currentX = it.first
                                     currentY = it.second
                                 }
@@ -131,24 +131,8 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
                         } catch (e: EmptyStackException) {
                             // we done here
                         }
-
-//                        if ((abs(abs(currentX) - abs(finishX)) > 10f) || (abs(
-//                                abs(currentY) - abs(
-//                                    finishY
-//                                )
-//                            ) > 10f)
-//                        ) {
-//                            currentX += if (currentX > finishX) -DELTA_COORDINATES else DELTA_COORDINATES
-//                            currentY += if (currentY > finishY) -DELTA_COORDINATES else DELTA_COORDINATES
-//                            matrix.preTranslate(
-//                                if (currentX > finishX) -DELTA_COORDINATES else DELTA_COORDINATES,
-//                                if (currentY > finishY) -DELTA_COORDINATES else DELTA_COORDINATES
-//                            )
-//                        }
                     }
                 }
-
-
                 canvas = null
                 try {
                     canvas = surfaceHolder.lockCanvas(null)
@@ -183,7 +167,6 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
             const val DELTA_TIME = 30
             const val DELTA_ANGLE = 2f
             const val DELTA_COORDINATES = 5f
-
         }
         /*--
         V1 solution:

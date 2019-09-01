@@ -86,7 +86,7 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
 
-    //project dependenciesввввввввваапвававаук
+    //project dependencies
     implementation project(path: ':carmovefeature')
     implementation project(path: ':models')
     implementation project(path: ':utils')

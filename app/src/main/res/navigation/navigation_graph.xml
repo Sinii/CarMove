@@ -4,13 +4,13 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        app:startDestination="@+id/converterFragment">
+        app:startDestination="@+id/carMapFragment">
 
 
     <fragment
-            android:id="@+id/converterFragment"
+            android:id="@+id/carMapFragment"
             android:name="com.anton.carmapfeature.ui.CarMapFragment"
-            android:label="ConverterFragment"
+            android:label="CarMapFragment"
             tools:layout="@layout/fragment_car_map"
     />
 

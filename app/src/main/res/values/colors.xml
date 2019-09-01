@@ -3,6 +3,4 @@
     <color name="colorPrimary">#EFFFFF</color>
     <color name="colorPrimaryDark">#E6E6E6E6</color>
     <color name="colorAccent">#D81B60</color>
-    <color name="shineLoadingColor">#FFFFFFFF</color>
-    <color name="loadingStubColor">#F2F4F8</color>
 </resources>
