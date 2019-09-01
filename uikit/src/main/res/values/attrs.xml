@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CarMapView">
+        <attr name="car_x" format="float" />
+        <attr name="car_y" format="float" />
+        <attr name="car_angle" format="float" />
+        <attr name="finish_x" format="float" />
+        <attr name="finish_y" format="float" />
+    </declare-styleable>
+</resources>

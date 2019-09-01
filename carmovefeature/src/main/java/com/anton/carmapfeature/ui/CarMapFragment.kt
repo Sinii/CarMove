@@ -1,0 +1,64 @@
+package com.anton.carmapfeature.ui
+
+import android.annotation.SuppressLint
+import android.view.MotionEvent.ACTION_DOWN
+import androidx.lifecycle.Observer
+import com.anton.carmapfeature.R
+import com.anton.carmapfeature.databinding.FragmentCarMapBinding
+import com.example.base.di.ViewModelFactory
+import com.example.base.ui.BaseFragment
+import com.example.utils.dLog
+
+
+class CarMapFragment : BaseFragment<FragmentCarMapBinding, ViewModelFactory>() {
+
+    override fun provideListOfViewModels(): Array<Class<*>> = arrayOf(
+        CarViewModel::class.java
+    )
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun provideActionsBinding(): (FragmentCarMapBinding, Set<*>) -> Unit =
+        { binding, viewModelList ->
+            "provideActionsBinding".dLog()
+            //binding.carMap.startThread()
+
+            viewModelList.forEach { viewModel ->
+                when (viewModel) {
+                    is CarViewModel -> {
+                        "provideActionsBinding CarViewModel".dLog()
+                        viewModel.carCoordinatesXYAngle.observe(this, Observer {
+                            "provideActionsBinding CarViewModel addAllCoordinates".dLog()
+
+                            binding.carMap.addAllCoordinates(it)
+                        })
+
+                        viewModel.carXYAngle.observe(this, Observer<Triple<Float, Float, Float>> {
+                            binding.carMap.addCoordinatesTriple(it)
+//                            binding.carMap.carX = it.first
+//                            binding.carMap.carY = it.second
+//                            binding.carMap.update()
+                        })
+                        viewModel.carAngle.observe(this, Observer<Float> {
+                            binding.carMap.updateAngle(it)
+                        })
+                        binding.carMap.setOnTouchListener { view, motionEvent ->
+                            if (motionEvent.action == ACTION_DOWN) {
+                                viewModel.destinationCoordinates(motionEvent.x, motionEvent.y, binding.carMap.getAngle(), binding.carMap.getCarX(), binding.carMap.getCarY())
+                                //binding.carMap.updateCoordinates(motionEvent.x, motionEvent.y)
+                            }
+                            return@setOnTouchListener true
+                        }
+                    }
+                }
+            }
+        }
+
+    override fun onStop() {
+        super.onStop()
+    }
+
+    override fun provideLayout() = R.layout.fragment_car_map
+
+    override fun provideLifecycleOwner() = this
+
+}
