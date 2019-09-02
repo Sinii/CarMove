@@ -1,16 +1,17 @@
 package com.example.uikit
 
 import android.content.Context
-import android.graphics.*
+import android.content.res.Resources
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.content.res.Resources
-import android.graphics.BitmapFactory
 import com.example.utils.dLog
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
-import kotlin.math.abs
+import kotlin.math.*
 
 
 class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
@@ -30,14 +31,14 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
     }
 
     fun updateAngle(angle: Float) {
-        //   drawThread?.finishAngle = angle
+        drawThread?.finishAngle = angle
     }
 
-    fun getCarX() = drawThread?.currentX
-    fun getCarY() = drawThread?.currentY
-    fun getAngle() = drawThread?.currentAngle
+    fun getCarX() = drawThread?.currentX ?: 0f
+    fun getCarY() = drawThread?.currentY ?: 0f
+    fun getAngle() = drawThread?.currentAngle ?: 0f
 
-    fun addCoordinatesTriple(xyPair: Triple<Float,Float, Float>) {
+    fun addCoordinatesTriple(xyPair: Triple<Float, Float, Float>) {
         drawThread?.addCoordinatesTriple(xyPair)
     }
 
@@ -75,57 +76,69 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
     internal class DrawThread(
         private val surfaceHolder: SurfaceHolder, resources: Resources
     ) : Thread() {
-        var finishAngle = 30f
+        var finishAngle = 0f
         var currentAngle = 0f
-
         var running = true
-
         var finishX = 0f
         var finishY = 0f
         var currentX = 0f
         var currentY = 0f
 
         private val movementCoordinates = ConcurrentLinkedQueue<Triple<Float, Float, Float>>()
+        private val carWidth = 250
+        private val carHeight = 150
+        private val carHalfWidth = carWidth.toFloat() / 2
+        private val carHalfHeight = carHeight.toFloat() / 2
 
-        private val picture = BitmapFactory.decodeResource(resources, R.drawable.car)
-        private val pictureWidth = (picture.width / 2).toFloat()
-        private val pictureHeight = (picture.height / 2).toFloat()
-
-        private val matrix = Matrix()
+        private val halfDiagonal =
+            sqrt((carWidth * carWidth + carHeight * carHeight).toDouble()) / 2
+        private val diagonalAngle = atan(carHeight / carWidth.toDouble())
         private var prevTime = 0L
-
+        private val paint = Paint()
 
         init {
-            matrix.setScale(.1f, .1f)
-            matrix.setTranslate(.0f, .0f)
             prevTime = System.currentTimeMillis()
+            paint.color = Color.RED
+            paint.strokeWidth = 10f
         }
 
         override fun run() {
             var canvas: Canvas?
+            var x1: Float = -carHalfWidth
+            var y1: Float = carHalfHeight
+            var x2: Float = carHalfWidth
+            var y2: Float = carHalfHeight
+            var x3: Float = carHalfWidth
+            var y3: Float = -carHalfHeight
+            var x4: Float = -carHalfWidth
+            var y4: Float = -carHalfHeight
             while (running) {
 
                 val now = System.currentTimeMillis()
                 val elapsedTime = now - prevTime
+
                 if (elapsedTime > DELTA_TIME) {
                     prevTime = now
-                    if (abs(abs(currentAngle) - abs(finishAngle)) > 2f) {
+                    if (abs(abs(currentAngle) - abs(finishAngle)) > .4f) {
                         " run currentAngle = $currentAngle finishAngle = $finishAngle".dLog()
                         currentAngle += if (currentAngle > finishAngle) -DELTA_ANGLE else DELTA_ANGLE
-                        matrix.preRotate(
-                            if (currentAngle > finishAngle) -DELTA_ANGLE else DELTA_ANGLE,
-                            pictureWidth,
-                            pictureHeight
-                        )
+
+                        x1 = halfDiagonal.toFloat() * cos(finishAngle + diagonalAngle).toFloat()
+                        y1 = halfDiagonal.toFloat() * sin(finishAngle + diagonalAngle).toFloat()
+                        x2 = halfDiagonal.toFloat() * cos(finishAngle - diagonalAngle).toFloat()
+                        y2 = halfDiagonal.toFloat() * sin(finishAngle - diagonalAngle).toFloat()
+
+                        x3 = -x1
+                        y3 = -y1
+                        x4 = -x2
+                        y4 = -y2
                     } else {
                         try {
                             movementCoordinates
                                 .poll()
                                 ?.let {
-                                    matrix.setTranslate(it.first, it.second)
-                                   // matrix.setRotate(it.third)
-                                    currentX = it.first
-                                    currentY = it.second
+                                    currentX += it.first
+                                    currentY += it.second
                                 }
 
                         } catch (e: EmptyStackException) {
@@ -137,8 +150,35 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
                 try {
                     canvas = surfaceHolder.lockCanvas(null)
                     synchronized(surfaceHolder) {
-                        canvas.drawColor(Color.BLACK)
-                        canvas.drawBitmap(picture, matrix, null)
+                        canvas.drawColor(Color.WHITE)
+                        canvas.drawLine(
+                            currentX + x1,
+                            currentY + y1,
+                            currentX + x2,
+                            currentY + y2,
+                            paint
+                        )
+                        canvas.drawLine(
+                            currentX + x2,
+                            currentY + y2,
+                            currentX + x3,
+                            currentY + y3,
+                            paint
+                        )
+                        canvas.drawLine(
+                            currentX + x3,
+                            currentY + y3,
+                            currentX + x4,
+                            currentY + y4,
+                            paint
+                        )
+                        canvas.drawLine(
+                            currentX + x4,
+                            currentY + y4,
+                            currentX + x1,
+                            currentY + y1,
+                            paint
+                        )
                     }
                 } finally {
                     surfaceHolder.unlockCanvasAndPost(canvas)
@@ -151,21 +191,18 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
         }
 
         fun addAllCoordinates(coordinates: Collection<Triple<Float, Float, Float>>) {
+            movementCoordinates.clear()
             movementCoordinates.addAll(coordinates)
         }
 
         fun updateFinishCoordinatesV1(x: Float, y: Float) {
             finishX = x
             finishY = y
-            "updateFinishCoordinatesV1 currentX = $currentX currentY = $currentY".dLog()
-            "updateFinishCoordinatesV1 finishX = $finishX finishY = $finishY".dLog()
-
-            //   matrix.setTranslate(x - pictureWidth, y - pictureHeight)
         }
 
         companion object {
             const val DELTA_TIME = 30
-            const val DELTA_ANGLE = 2f
+            const val DELTA_ANGLE = .2f
             const val DELTA_COORDINATES = 5f
         }
         /*--

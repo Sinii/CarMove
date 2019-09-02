@@ -19,32 +19,27 @@ class CarMapFragment : BaseFragment<FragmentCarMapBinding, ViewModelFactory>() {
     @SuppressLint("ClickableViewAccessibility")
     override fun provideActionsBinding(): (FragmentCarMapBinding, Set<*>) -> Unit =
         { binding, viewModelList ->
-            "provideActionsBinding".dLog()
-            //binding.carMap.startThread()
-
             viewModelList.forEach { viewModel ->
                 when (viewModel) {
                     is CarViewModel -> {
                         "provideActionsBinding CarViewModel".dLog()
                         viewModel.carCoordinatesXYAngle.observe(this, Observer {
                             "provideActionsBinding CarViewModel addAllCoordinates".dLog()
-
                             binding.carMap.addAllCoordinates(it)
                         })
 
                         viewModel.carXYAngle.observe(this, Observer<Triple<Float, Float, Float>> {
                             binding.carMap.addCoordinatesTriple(it)
-//                            binding.carMap.carX = it.first
-//                            binding.carMap.carY = it.second
-//                            binding.carMap.update()
                         })
                         viewModel.carAngle.observe(this, Observer<Float> {
                             binding.carMap.updateAngle(it)
                         })
                         binding.carMap.setOnTouchListener { view, motionEvent ->
                             if (motionEvent.action == ACTION_DOWN) {
-                                viewModel.destinationCoordinates(motionEvent.x, motionEvent.y, binding.carMap.getAngle(), binding.carMap.getCarX(), binding.carMap.getCarY())
-                                //binding.carMap.updateCoordinates(motionEvent.x, motionEvent.y)
+                                viewModel.destinationCoordinates(
+                                    motionEvent.x, motionEvent.y, binding.carMap.getAngle(),
+                                    binding.carMap.getCarX(), binding.carMap.getCarY()
+                                )
                             }
                             return@setOnTouchListener true
                         }
@@ -52,10 +47,6 @@ class CarMapFragment : BaseFragment<FragmentCarMapBinding, ViewModelFactory>() {
                 }
             }
         }
-
-    override fun onStop() {
-        super.onStop()
-    }
 
     override fun provideLayout() = R.layout.fragment_car_map
 
