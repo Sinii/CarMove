@@ -8,10 +8,12 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import com.example.utils.dLog
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
-import kotlin.math.*
+import kotlin.math.atan
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 
 class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
@@ -69,10 +71,6 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
         }
     }
 
-    fun updateCoordinates(x: Float, y: Float) {
-        drawThread?.updateFinishCoordinatesV1(x, y)
-    }
-
     internal class DrawThread(
         private val surfaceHolder: SurfaceHolder, resources: Resources
     ) : Thread() {
@@ -119,31 +117,27 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
 
                 if (elapsedTime > DELTA_TIME) {
                     prevTime = now
-                    if (abs(abs(currentAngle) - abs(finishAngle)) > .4f) {
-                        " run currentAngle = $currentAngle finishAngle = $finishAngle".dLog()
-                        currentAngle += if (currentAngle > finishAngle) -DELTA_ANGLE else DELTA_ANGLE
-
-                        x1 = halfDiagonal.toFloat() * cos(finishAngle + diagonalAngle).toFloat()
-                        y1 = halfDiagonal.toFloat() * sin(finishAngle + diagonalAngle).toFloat()
-                        x2 = halfDiagonal.toFloat() * cos(finishAngle - diagonalAngle).toFloat()
-                        y2 = halfDiagonal.toFloat() * sin(finishAngle - diagonalAngle).toFloat()
-
-                        x3 = -x1
-                        y3 = -y1
-                        x4 = -x2
-                        y4 = -y2
-                    } else {
-                        try {
-                            movementCoordinates
-                                .poll()
-                                ?.let {
-                                    currentX += it.first
-                                    currentY += it.second
-                                }
-
-                        } catch (e: EmptyStackException) {
-                            // we done here
-                        }
+                    try {
+                        movementCoordinates
+                            .poll()
+                            ?.let {
+                                currentX += it.first
+                                currentY += it.second
+                                x1 =
+                                    halfDiagonal.toFloat() * cos(it.third + diagonalAngle).toFloat()
+                                y1 =
+                                    halfDiagonal.toFloat() * sin(it.third + diagonalAngle).toFloat()
+                                x2 =
+                                    halfDiagonal.toFloat() * cos(it.third - diagonalAngle).toFloat()
+                                y2 =
+                                    halfDiagonal.toFloat() * sin(it.third - diagonalAngle).toFloat()
+                                x3 = -x1
+                                y3 = -y1
+                                x4 = -x2
+                                y4 = -y2
+                            }
+                    } catch (e: EmptyStackException) {
+                        // we done here
                     }
                 }
                 canvas = null
@@ -195,15 +189,8 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
             movementCoordinates.addAll(coordinates)
         }
 
-        fun updateFinishCoordinatesV1(x: Float, y: Float) {
-            finishX = x
-            finishY = y
-        }
-
         companion object {
             const val DELTA_TIME = 30
-            const val DELTA_ANGLE = .2f
-            const val DELTA_COORDINATES = 5f
         }
         /*--
         V1 solution:
