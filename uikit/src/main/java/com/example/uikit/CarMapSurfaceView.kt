@@ -123,6 +123,7 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
                             ?.let {
                                 currentX += it.first
                                 currentY += it.second
+                                currentAngle = it.third
                                 x1 =
                                     halfDiagonal.toFloat() * cos(it.third + diagonalAngle).toFloat()
                                 y1 =

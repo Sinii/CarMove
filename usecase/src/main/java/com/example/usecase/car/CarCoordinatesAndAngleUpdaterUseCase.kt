@@ -3,6 +3,7 @@ package com.example.usecase.car
 import com.example.base.usecase.BaseUseCase
 import com.example.utils.dLog
 import com.example.utils.toTriple
+import java.lang.Math.toDegrees
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.abs
@@ -10,7 +11,8 @@ import kotlin.math.atan
 import kotlin.math.cos
 import kotlin.math.sin
 
-class CarCoordinatesAndAngleUpdaterUseCase @Inject constructor() :
+class CarCoordinatesAndAngleUpdaterUseCase
+@Inject constructor() :
     BaseUseCase<CarCoordinatesAndAngleUpdaterUseCase.Params, CarCoordinatesAndAngleUpdaterUseCase.Result>() {
     override suspend fun doWork(params: Params): Result {
 
@@ -27,19 +29,19 @@ class CarCoordinatesAndAngleUpdaterUseCase @Inject constructor() :
         var carRotationSpeed = 0f
 
         val middleXPoint = abs(abs(currentX) - abs(finishX)) / 2 + params.oldX
-        val finishAngle = atan(abs(finishY - currentY) / abs(finishX - currentX))
+        val finishAngle = atan((finishY - currentY) / (finishX - currentX))
 
         while ((abs(abs(currentX) - abs(finishX)) > COORDINATION_CONDITION)
             || (abs(abs(currentY) - abs(finishY)) > COORDINATION_CONDITION)
         ) {
             var dx = 0f
             var dy = 0f
-            if (abs(abs(currentAngle) - abs(finishAngle)) > ANGLE_CONDITION) {
-                " run currentAngle = $currentAngle finishAngle = $finishAngle".dLog()
+            if (abs(currentAngle - finishAngle) > ANGLE_CONDITION) {
+                " run currentAngle = ${toDegrees(currentAngle.toDouble())} finishAngle = ${toDegrees(finishAngle.toDouble())}".dLog()
                 currentAngle += if (currentAngle > finishAngle) -DELTA_ANGLE else DELTA_ANGLE
             } else {
                 val instantFinishAngle = atan(abs(finishY - currentY) / abs(finishX - currentX))
-                val middleAngle = abs(abs(currentAngle) - abs(instantFinishAngle)) / 2
+                val middleAngle = ((currentAngle) - (instantFinishAngle)) / 2
                 val instantAcceleration =
                     if (currentX > middleXPoint) -CAR_ACCELERATION else CAR_ACCELERATION
                 val instantRotationAcceleration =
@@ -52,9 +54,8 @@ class CarCoordinatesAndAngleUpdaterUseCase @Inject constructor() :
                     carRotationSpeed += instantRotationAcceleration
                 }
                 //val angle = atan(abs(finishY - currentY) / abs(finishX - currentX))
-
                 if (abs(currentAngle - instantFinishAngle) > ANGLE_CONDITION) {
-                    currentAngle += carRotationSpeed
+                   // currentAngle += carRotationSpeed
                 } else {
                     carRotationSpeed = 0f
                 }
@@ -84,8 +85,8 @@ class CarCoordinatesAndAngleUpdaterUseCase @Inject constructor() :
 
     companion object {
         const val CAR_MAX_SPEED = 200f
-        const val DELTA_ANGLE = .2f
-        const val ANGLE_CONDITION = .4f
+        const val DELTA_ANGLE = .02f
+        const val ANGLE_CONDITION = .05f
         const val COORDINATION_CONDITION = 30f
 
 
