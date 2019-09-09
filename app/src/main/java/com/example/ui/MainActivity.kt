@@ -1,25 +1,19 @@
 package com.example.ui
 
 import android.os.Bundle
-import android.view.WindowManager
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.example.example.R
-import com.example.interfaces.ActivityDefaultBehavior
-import dagger.android.AndroidInjector
+import com.example.base.di.interfaces.ActivityDefaultBehavior
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
+import dagger.android.support.DaggerAppCompatActivity
 import javax.inject.Inject
 
 
-class MainActivity : AppCompatActivity(), HasSupportFragmentInjector, ActivityDefaultBehavior {
+class MainActivity : DaggerAppCompatActivity(), ActivityDefaultBehavior {
 
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
-
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> = dispatchingAndroidInjector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

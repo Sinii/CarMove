@@ -1,8 +1,0 @@
-<resources>
-    <string name="app_name">models</string>
-    <string name="test_string">my test string</string>
-    <string name="payment_method_bank_transfer">Bank transfer</string>
-    <string name="payment_method_e_money">E-money</string>
-    <string name="payment_method_cash">Cash</string>
-
-</resources>

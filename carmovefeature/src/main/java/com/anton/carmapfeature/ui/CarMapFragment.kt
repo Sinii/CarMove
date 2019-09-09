@@ -24,17 +24,10 @@ class CarMapFragment : BaseFragment<FragmentCarMapBinding, ViewModelFactory>() {
                     is CarViewModel -> {
                         "provideActionsBinding CarViewModel".dLog()
                         viewModel.carCoordinatesXYAngle.observe(this, Observer {
-                            "provideActionsBinding CarViewModel addAllCoordinates".dLog()
+                            "CarViewModel addAllCoordinates".dLog()
                             binding.carMap.addAllCoordinates(it)
                         })
-
-                        viewModel.carXYAngle.observe(this, Observer<Triple<Float, Float, Float>> {
-                            binding.carMap.addCoordinatesTriple(it)
-                        })
-                        viewModel.carAngle.observe(this, Observer<Float> {
-                            binding.carMap.updateAngle(it)
-                        })
-                        binding.carMap.setOnTouchListener { view, motionEvent ->
+                        binding.carMap.setOnTouchListener { _, motionEvent ->
                             if (motionEvent.action == ACTION_DOWN) {
                                 viewModel.destinationCoordinates(
                                     motionEvent.x, motionEvent.y, binding.carMap.getAngle(),

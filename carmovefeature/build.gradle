@@ -57,20 +57,10 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesTestVersion"
 
-    // recycler view
-    implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
-    implementation "com.ethanhua:skeleton:$skeletonVersion"
-    implementation "io.supercharge:shimmerlayout:$shimmerlayoutVersion"
-
-    // requester
+    // coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
 
-    // retrofit
-    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
-    implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
-    implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:$retrofitCoroutinesVersion"
-    implementation "com.squareup.okhttp3:logging-interceptor:$okHttpLoggingInterceptorVersion"
 
     // navigation
     implementation "android.arch.navigation:navigation-fragment-ktx:$navigationVersion"
@@ -82,10 +72,7 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
 
-    implementation project(path: ':models')
     implementation project(path: ':usecase')
-    implementation project(path: ':repository')
     implementation project(path: ':base')
     implementation project(path: ':utils')
-    implementation project(path: ':network')
 }

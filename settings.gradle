@@ -1,2 +1,1 @@
-include ':app', ':base', ':network', ':models', ':utils', ':usecase', ':repository', ':carmovefeature'
-include ':uikit'
+include ':app', ':base', ':utils', ':usecase', ':carmovefeature', ':uikit'

@@ -1,4 +1,4 @@
-package com.example.interfaces
+package com.example.base.di.interfaces
 
 interface ActivityDefaultBehavior {
 

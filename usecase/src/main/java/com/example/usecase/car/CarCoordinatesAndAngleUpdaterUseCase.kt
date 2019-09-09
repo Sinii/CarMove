@@ -24,8 +24,8 @@ class CarCoordinatesAndAngleUpdaterUseCase
         val finishY = params.finishY
 
         var carSpeed = 0f
-        var carSpeedX = 0f
-        var carSpeedY = 0f
+        var carSpeedX: Float
+        var carSpeedY: Float
         var carRotationSpeed = 0f
 
         val middleXPoint = abs(abs(currentX) - abs(finishX)) / 2 + params.oldX

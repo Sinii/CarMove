@@ -53,13 +53,6 @@ dependencies {
 
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-
-    // recycler view
-    implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
-    implementation "com.ethanhua:skeleton:$skeletonVersion"
-    implementation "io.supercharge:shimmerlayout:$shimmerlayoutVersion"
-
-    // requester
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
 
@@ -88,10 +81,7 @@ dependencies {
 
     //project dependencies
     implementation project(path: ':carmovefeature')
-    implementation project(path: ':models')
     implementation project(path: ':utils')
     implementation project(path: ':base')
-    implementation project(path: ':network')
     implementation project(path: ':usecase')
-    implementation project(path: ':repository')
 }

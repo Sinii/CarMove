@@ -1,7 +1,6 @@
 package com.example.uikit
 
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -32,17 +31,9 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
         holder.addCallback(this)
     }
 
-    fun updateAngle(angle: Float) {
-        drawThread?.finishAngle = angle
-    }
-
     fun getCarX() = drawThread?.currentX ?: 0f
     fun getCarY() = drawThread?.currentY ?: 0f
     fun getAngle() = drawThread?.currentAngle ?: 0f
-
-    fun addCoordinatesTriple(xyPair: Triple<Float, Float, Float>) {
-        drawThread?.addCoordinatesTriple(xyPair)
-    }
 
     fun addAllCoordinates(coordinates: Collection<Triple<Float, Float, Float>>) {
         drawThread?.addAllCoordinates(coordinates)
@@ -51,7 +42,7 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
 
     override fun surfaceCreated(holder: SurfaceHolder) {
-        drawThread = DrawThread(getHolder(), resources)
+        drawThread = DrawThread(getHolder())
             .apply {
                 running = true
                 start()
@@ -72,7 +63,7 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
     }
 
     internal class DrawThread(
-        private val surfaceHolder: SurfaceHolder, resources: Resources
+        private val surfaceHolder: SurfaceHolder
     ) : Thread() {
         var finishAngle = 0f
         var currentAngle = 0f
@@ -179,10 +170,6 @@ class CarMapSurfaceView : SurfaceView, SurfaceHolder.Callback {
                     surfaceHolder.unlockCanvasAndPost(canvas)
                 }
             }
-        }
-
-        fun addCoordinatesTriple(xyAngleTriple: Triple<Float, Float, Float>) {
-            movementCoordinates.add(xyAngleTriple)
         }
 
         fun addAllCoordinates(coordinates: Collection<Triple<Float, Float, Float>>) {

@@ -6,22 +6,17 @@ import com.example.usecase.car.CarCoordinatesAndAngleUpdaterUseCase
 import com.example.utils.dLog
 import kotlinx.coroutines.Job
 import javax.inject.Inject
-import kotlin.math.atan
 
 class CarViewModel
 @Inject constructor(
     private val carCoordinatesAndAngleUpdaterUseCase: CarCoordinatesAndAngleUpdaterUseCase
 ) : BaseViewModel() {
     val carCoordinatesXYAngle = MutableLiveData<Collection<Triple<Float, Float, Float>>>()
-    val carXYAngle = MutableLiveData(Triple(0f, 0f, 0f))
-    val carFinishXY = MutableLiveData(Pair(0f, 0f))
-    val carAngle = MutableLiveData(0f)
 
+    private var carFinishXY = 0f to 0f
     private var carCoordinateUpdater: Job? = null
 
-    override fun doAutoMainWork() {
-        "doAutoMainWork".dLog()
-    }
+    override fun doAutoMainWork() {}
 
     private fun carUpdater(
         oldAngle: Float,
@@ -29,31 +24,22 @@ class CarViewModel
         oldY: Float
     ) = doWork {
         " carUpdater ".dLog()
-        val currentFinishXY = carFinishXY.value
-        if (currentFinishXY != null) {
-            val finishX = currentFinishXY.first
-            val finishY = currentFinishXY.second
-            val finishAngle =
-                atan(
-                    (oldY - currentFinishXY.second) / (oldX - currentFinishXY.first)
+        val currentFinishXY = carFinishXY
+        val finishX = currentFinishXY.first
+        val finishY = currentFinishXY.second
+        val coordinates = carCoordinatesAndAngleUpdaterUseCase
+            .doWork(
+                CarCoordinatesAndAngleUpdaterUseCase.Params(
+                    oldX,
+                    oldY,
+                    oldAngle,
+                    finishX,
+                    finishY
                 )
-            carAngle.postValue(finishAngle)
-
-            val coordinates = carCoordinatesAndAngleUpdaterUseCase
-                .doWork(
-                    CarCoordinatesAndAngleUpdaterUseCase.Params(
-                        oldX,
-                        oldY,
-                        oldAngle,
-                        finishX,
-                        finishY
-                    )
-                )
-                .coordinates
-            carCoordinatesXYAngle.postValue(coordinates)
-        }
+            )
+            .coordinates
+        carCoordinatesXYAngle.postValue(coordinates)
     }
-
 
     fun destinationCoordinates(
         x: Float,
@@ -63,7 +49,7 @@ class CarViewModel
         currentY: Float
     ) {
         "destinationCoordinates".dLog()
-        carFinishXY.postValue(Pair(x, y))
+        carFinishXY = x to y
         carCoordinateUpdater?.cancel()
         carCoordinateUpdater = carUpdater(currentAngle, currentX, currentY)
     }
